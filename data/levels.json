@@ -1,0 +1,32 @@
+{
+  "levels": [
+    {
+      "id": "beginner-1",
+      "name": "初級一",
+      "lessonStart": 1,
+      "lessonEnd": 12
+    },
+    {
+      "id": "beginner-2",
+      "name": "初級二",
+      "lessonStart": 1,
+      "lessonEnd": 12
+    },
+    {
+      "id": "advanced-1",
+      "name": "進階一",
+      "lessonStart": 1,
+      "lessonEnd": 12
+    },
+    {
+      "id": "advanced-2",
+      "name": "進階二",
+      "lessonStart": 1,
+      "lessonEnd": 12
+    }
+  ],
+  "defaultLesson": {
+    "levelId": "beginner-1",
+    "lessonNumber": 1
+  }
+}
