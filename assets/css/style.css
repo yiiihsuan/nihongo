@@ -257,6 +257,16 @@ body {
   cursor: pointer;
 }
 
+.practice-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.practice-btn-secondary {
+  background: #fff;
+  color: #2440a4;
+}
+
 .score-badge {
   display: inline-flex;
   align-items: center;
@@ -273,6 +283,17 @@ body {
 .practice-transcript {
   margin: 8px 0 0;
   color: var(--subtext);
+}
+
+.practice-transcript {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  resize: vertical;
+  font: inherit;
+  color: var(--text);
+  background: #fff;
 }
 
 .jp {

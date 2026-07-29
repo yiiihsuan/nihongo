@@ -11,6 +11,7 @@ const lessonContent = document.getElementById("lessonContent");
 const sidebar = document.getElementById("sidebar");
 const sidebarToggle = document.getElementById("sidebarToggle");
 let activeRecognition = null;
+let activePracticeControls = null;
 
 sidebarToggle.addEventListener("click", () => {
   sidebar.classList.toggle("open");
@@ -103,7 +104,7 @@ function createSentenceCard(item) {
   if (item.audio) {
     const audio = document.createElement("audio");
     audio.controls = true;
-    audio.preload = "none";
+    audio.preload = "metadata";
     audio.src = item.audio;
     audioWrap.appendChild(audio);
   } else {
@@ -234,12 +235,29 @@ function stopRecognition() {
     activeRecognition.stop();
     activeRecognition = null;
   }
+  if (activePracticeControls) {
+    activePracticeControls.startBtn.disabled = false;
+    activePracticeControls.stopBtn.disabled = true;
+    activePracticeControls = null;
+  }
 }
 
-function startShadowing(item, resultEl, scoreEl, statusEl) {
+function setPracticeScore(expected, transcriptEl, scoreEl, statusEl) {
+  const transcript = transcriptEl.value.trim();
+  if (!transcript) {
+    scoreEl.textContent = "—";
+    statusEl.textContent = "請先說話或輸入辨識文字。";
+    return;
+  }
+  const score = scoreTranscript(expected, transcript);
+  scoreEl.textContent = `${score} / 100`;
+  statusEl.textContent = score >= 80 ? "很接近標準句。" : "可以再跟一次。";
+}
+
+function startShadowing(item, transcriptEl, scoreEl, statusEl, startBtn, stopBtn) {
   const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!Recognition) {
-    statusEl.textContent = "此瀏覽器不支援語音辨識。";
+    statusEl.textContent = "此瀏覽器不支援語音辨識，可改用手動輸入後按「手動評分」。";
     return;
   }
 
@@ -247,29 +265,37 @@ function startShadowing(item, resultEl, scoreEl, statusEl) {
 
   const recognition = new Recognition();
   activeRecognition = recognition;
+  activePracticeControls = { startBtn, stopBtn };
   recognition.lang = "ja-JP";
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
 
   statusEl.textContent = "請開始跟讀...";
-  resultEl.textContent = "";
+  transcriptEl.value = "";
   scoreEl.textContent = "—";
+  startBtn.disabled = true;
+  stopBtn.disabled = false;
 
   recognition.onresult = (event) => {
     const transcript = event.results[0][0].transcript;
-    const score = scoreTranscript(item.jp, transcript);
-    resultEl.textContent = transcript;
-    scoreEl.textContent = `${score} / 100`;
-    statusEl.textContent = score >= 80 ? "很接近標準句。" : "可以再跟一次。";
+    transcriptEl.value = transcript;
+    setPracticeScore(item.jp, transcriptEl, scoreEl, statusEl);
   };
 
   recognition.onerror = (event) => {
+    if (event.error === "not-allowed") {
+      statusEl.textContent = "未取得麥克風權限，請允許後再試。";
+      return;
+    }
     statusEl.textContent = `辨識失敗：${event.error}`;
   };
 
   recognition.onend = () => {
     if (activeRecognition === recognition) {
       activeRecognition = null;
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      activePracticeControls = null;
     }
   };
 
@@ -300,9 +326,20 @@ function renderConversationSection(section) {
   if (section.audio) {
     const audio = document.createElement("audio");
     audio.controls = true;
-    audio.preload = "none";
+    audio.preload = "metadata";
     audio.src = section.audio;
     toolbar.appendChild(audio);
+
+    const audioStatus = document.createElement("p");
+    audioStatus.className = "practice-status";
+    audioStatus.textContent = "音檔已載入。";
+    audio.addEventListener("error", () => {
+      audioStatus.textContent = "音檔載入失敗，請重新整理或確認網址。";
+    });
+    audio.addEventListener("loadedmetadata", () => {
+      audioStatus.textContent = `音檔長度：約 ${Math.round(audio.duration)} 秒`;
+    });
+    toolbar.appendChild(audioStatus);
   }
 
   const hint = document.createElement("p");
@@ -354,6 +391,12 @@ function renderConversationSection(section) {
     startBtn.className = "practice-btn";
     startBtn.textContent = "開始跟讀";
 
+    const stopBtn = document.createElement("button");
+    stopBtn.type = "button";
+    stopBtn.className = "practice-btn practice-btn-secondary";
+    stopBtn.textContent = "停止";
+    stopBtn.disabled = true;
+
     const score = document.createElement("span");
     score.className = "score-badge";
     score.textContent = "—";
@@ -362,15 +405,31 @@ function renderConversationSection(section) {
     status.className = "practice-status";
     status.textContent = "尚未評分";
 
-    const transcript = document.createElement("p");
+    const transcript = document.createElement("textarea");
     transcript.className = "practice-transcript";
-    transcript.textContent = "";
+    transcript.rows = 2;
+    transcript.placeholder = "辨識結果會出現在這裡；也可手動貼上後評分。";
 
     startBtn.addEventListener("click", () => {
-      startShadowing(item, transcript, score, status);
+      startShadowing(item, transcript, score, status, startBtn, stopBtn);
+    });
+
+    stopBtn.addEventListener("click", () => {
+      status.textContent = "已手動停止跟讀。";
+      stopRecognition();
+    });
+
+    const manualScoreBtn = document.createElement("button");
+    manualScoreBtn.type = "button";
+    manualScoreBtn.className = "practice-btn practice-btn-secondary";
+    manualScoreBtn.textContent = "手動評分";
+    manualScoreBtn.addEventListener("click", () => {
+      setPracticeScore(item.jp, transcript, score, status);
     });
 
     actions.appendChild(startBtn);
+    actions.appendChild(stopBtn);
+    actions.appendChild(manualScoreBtn);
     actions.appendChild(score);
     row.appendChild(speaker);
     row.appendChild(text);
