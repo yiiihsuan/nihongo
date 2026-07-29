@@ -342,6 +342,60 @@
           ]
         }
       ]
+    },
+    {
+      "title": "問題 2番",
+      "groups": [
+        {
+          "title": "1.",
+          "items": [
+            "女：山田（やまだ）さんは お酒（さけ）を 飲（の）みますか。\n羅馬拼音：Yamada-san wa osake o nomimasu ka.\n中文：山田先生/小姐喝酒嗎？",
+            "男：はい、飲（の）みます。\n羅馬拼音：hai, nomimasu.\n中文：是的，有喝。",
+            "女：いつも どこで 飲（の）みますか。\n羅馬拼音：itsumo dokode nomimasu ka.\n中文：平時都在哪裡喝？",
+            "男：うちで 飲（の）みます。\n羅馬拼音：uchi de nomimasu.\n中文：在家喝。",
+            "題目（判斷句）：山田（やまだ）さんは お酒（さけ）を 飲（の）みません。\n羅馬拼音：Yamada-san wa osake o nomimasen.\n中文：山田先生/小姐不喝酒。\n答案：✕（錯誤，因為對話中表示有喝酒）"
+          ]
+        },
+        {
+          "title": "2.",
+          "items": [
+            "女：ミラーさん、今朝（けさ） 朝（あさ）ごはんを 買（た）べましたか。\n羅馬拼音：Miraa-san, kesa asagohan o tabemashita ka.\n中文：米勒先生，今天早上有吃早餐嗎？",
+            "男：はい、買（た）べました。\n羅馬拼音：hai, tabemashita.\n中文：是的，吃了。",
+            "女：何（なに）を 買（た）べましたか。\n羅馬拼音：nani o tabemashita ka.\n中文：吃了什麼？",
+            "男：パンと 卵（たまご）を 買（た）べました。\n羅馬拼音：pan to tamago o tabemashita.\n中文：吃了麵包和蛋。",
+            "題目（判斷句）：ミラーさんは 今朝（けさ） パンと 卵（たまご）を 買（た）べました。\n羅馬拼音：Miraa-san wa kesa pan to tamago o tabemashita.\n中文：米勒先生今天早上吃了麵包和蛋。\n答案：◯（正確）"
+          ]
+        },
+        {
+          "title": "3.",
+          "items": [
+            "女：ミラーさん、土曜日（どようび） 何（なに）を しましたか。\n羅馬拼音：Miraa-san, doyoubi nani o shimashita ka.\n中文：米勒先生，星期六做了什麼？",
+            "男：朝（あさ） 図書館（としょかん）で 勉強（べんきょう）しました。\n羅馬拼音：asa Toshokan de benkyou shimashita.\n中文：早上在圖書館唸書。",
+            "女：午後（ごご） 何（なに）を しましたか。\n羅馬拼音：gogo nani o shimashita ka.\n中文：下午做了什麼？",
+            "男：神戸（こうべ）で 映画（えいが）を 見（み）ました。\n羅馬拼音：Koube de eiga o mimashita.\n中文：在神戶看了電影。",
+            "題目（判斷句）：ミラーさんは 土曜日（どようび）の 午後（ごご） 神戸（こうべ）で 映画（えいが）を 見（み）ました。\n羅馬拼音：Miraa-san wa doyoubi no gogo Koube de eiga o mimashita.\n中文：米勒先生星期六下午在神戶看了電影。\n答案：◯（正確）"
+          ]
+        },
+        {
+          "title": "4.",
+          "items": [
+            "男：李（い）さん、昨日（きのう） どこへ 行（い）きましたか。\n羅馬拼音：I-san, kinou doko e ikimashita ka.\n中文：小李，昨天去了哪裡？",
+            "女：京都（きょうと）へ 行（い）きました。\n羅馬拼音：Kyouto e ikimashita.\n中文：去了京都。",
+            "男：京都（きょうと）で 何（なに）を しましたか。\n羅馬拼音：Kyouto de nani o shimashita ka.\n中文：在京都做了什麼？",
+            "女：お花見（はなみ）を しました。\n羅馬拼音：ohanami o shimashita.\n中文：去賞花了。",
+            "題目（判斷句）：李（い）さんは 昨日（きのう） 京都（きょうと）で お花見（はなみ）を しました。\n羅馬拼音：I-san wa kinou Kyouto de ohanami o shimashita.\n中文：小李昨天在京都賞花了。\n答案：◯（正確）"
+          ]
+        },
+        {
+          "title": "5.",
+          "items": [
+            "女：ミラーさん、日曜日（にちようび） いっしょに テニスを しませんか。\n羅馬拼音：Miraa-san, nichiyoubi isshoni tenisu o shimasen ka.\n中文：米勒先生，週日要不要一起打網球？",
+            "男：ええ、いいですね。どこで しますか。\n羅馬拼音：ee, ii desu ne. dokode shimasu ka.\n中文：好啊，太棒了。在哪裡打呢？",
+            "女：富士大学（ふじだいがく）で しましょう。\n羅馬拼音：Fuji Daigaku de shimashou.\n中文：就在富士大學打吧。",
+            "題目（判斷句）：ミラーさんは 日曜日（にちようび） 富士大学（ふじだいがく）へ 行（い）きます。\n羅馬拼音：Miraa-san wa nichiyoubi Fuji Daigaku e ikimasu.\n中文：米勒先生週日要去富士大學。\n答案：◯（正確，因為答應了約定要去那裡打網球）"
+          ]
+        }
+      ]
     }
   ]
 }
