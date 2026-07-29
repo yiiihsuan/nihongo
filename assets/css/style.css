@@ -296,6 +296,17 @@ body {
   color: var(--subtext);
 }
 
+.practice-recording {
+  margin: 8px 0 0;
+  color: var(--subtext);
+}
+
+.recorded-audio {
+  margin-top: 8px;
+  width: 100%;
+  max-width: 420px;
+}
+
 .pitch-canvas {
   margin-top: 8px;
   width: 100%;

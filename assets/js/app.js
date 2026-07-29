@@ -351,6 +351,9 @@ function stopPitchTracking() {
   activePitchSession = null;
 
   cancelAnimationFrame(session.rafId);
+  if (session.mediaRecorder && session.mediaRecorder.state !== "inactive") {
+    session.mediaRecorder.stop();
+  }
   session.stream.getTracks().forEach((track) => track.stop());
   session.audioContext.close();
 
@@ -365,7 +368,7 @@ function stopPitchTracking() {
   session.toneStatusEl.textContent = `語調：${analysis.minHz}-${analysis.maxHz}Hz（跨度 ${analysis.range}Hz）。${analysis.advice}`;
 }
 
-async function startPitchTracking(pitchLiveEl, pitchCanvas, toneScoreEl, toneStatusEl) {
+async function startPitchTracking(pitchLiveEl, pitchCanvas, toneScoreEl, toneStatusEl, recordedAudioEl, recordingStatusEl) {
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     toneStatusEl.textContent = "語調：此瀏覽器不支援麥克風擷取。";
     return false;
@@ -386,6 +389,37 @@ async function startPitchTracking(pitchLiveEl, pitchCanvas, toneScoreEl, toneSta
 
     const buffer = new Float32Array(analyser.fftSize);
     const pitches = [];
+    let mediaRecorder = null;
+    if (window.MediaRecorder) {
+      const chunks = [];
+      mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data && event.data.size > 0) {
+          chunks.push(event.data);
+        }
+      };
+      mediaRecorder.onstop = () => {
+        if (!chunks.length) {
+          recordingStatusEl.textContent = "錄音失敗，請再試一次。";
+          return;
+        }
+        const blob = new Blob(chunks, { type: "audio/webm" });
+        const oldUrl = recordedAudioEl.dataset.objectUrl;
+        if (oldUrl) {
+          URL.revokeObjectURL(oldUrl);
+        }
+        const objectUrl = URL.createObjectURL(blob);
+        recordedAudioEl.src = objectUrl;
+        recordedAudioEl.dataset.objectUrl = objectUrl;
+        recordedAudioEl.hidden = false;
+        recordingStatusEl.textContent = "已錄音，可回放。";
+      };
+      mediaRecorder.start();
+      recordingStatusEl.textContent = "錄音中...";
+    } else {
+      recordingStatusEl.textContent = "此瀏覽器不支援錄音回放。";
+    }
+
     let rafId = 0;
     const capture = () => {
       analyser.getFloatTimeDomainData(buffer);
@@ -405,7 +439,8 @@ async function startPitchTracking(pitchLiveEl, pitchCanvas, toneScoreEl, toneSta
       pitches,
       pitchCanvas,
       toneScoreEl,
-      toneStatusEl
+      toneStatusEl,
+      mediaRecorder
     };
     toneScoreEl.textContent = "語調 分析中";
     toneStatusEl.textContent = "語調：分析中...";
@@ -441,7 +476,7 @@ function setPracticeScore(expected, transcriptEl, scoreEl, statusEl) {
   statusEl.textContent = score >= 80 ? "很接近標準句。" : "可以再跟一次。";
 }
 
-async function startShadowing(item, transcriptEl, scoreEl, toneScoreEl, statusEl, toneStatusEl, pitchLiveEl, startBtn, stopBtn) {
+async function startShadowing(item, transcriptEl, scoreEl, toneScoreEl, statusEl, toneStatusEl, pitchLiveEl, recordedAudioEl, recordingStatusEl, startBtn, stopBtn) {
   const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!Recognition) {
     statusEl.textContent = "此瀏覽器不支援語音辨識，可改用手動輸入後按「手動評分」。";
@@ -463,10 +498,19 @@ async function startShadowing(item, transcriptEl, scoreEl, toneScoreEl, statusEl
   toneScoreEl.textContent = "語調 —";
   toneStatusEl.textContent = "語調：尚未分析";
   pitchLiveEl.textContent = "即時音高：—";
+  recordingStatusEl.textContent = "尚未錄音";
+  recordedAudioEl.hidden = true;
   startBtn.disabled = true;
   stopBtn.disabled = false;
 
-  await startPitchTracking(pitchLiveEl, document.getElementById(`pitch-canvas-${item.practiceId}`), toneScoreEl, toneStatusEl);
+  await startPitchTracking(
+    pitchLiveEl,
+    document.getElementById(`pitch-canvas-${item.practiceId}`),
+    toneScoreEl,
+    toneStatusEl,
+    recordedAudioEl,
+    recordingStatusEl
+  );
 
   recognition.onresult = (event) => {
     const transcript = event.results[0][0].transcript;
@@ -618,13 +662,35 @@ function renderConversationSection(section) {
     pitchCanvas.id = `pitch-canvas-${item.practiceId}`;
     drawPitchCanvas(pitchCanvas, []);
 
+    const recordingStatus = document.createElement("p");
+    recordingStatus.className = "practice-recording";
+    recordingStatus.textContent = "尚未錄音";
+
+    const recordedAudio = document.createElement("audio");
+    recordedAudio.className = "recorded-audio";
+    recordedAudio.controls = true;
+    recordedAudio.preload = "metadata";
+    recordedAudio.hidden = true;
+
     const transcript = document.createElement("textarea");
     transcript.className = "practice-transcript";
     transcript.rows = 2;
     transcript.placeholder = "辨識結果會出現在這裡；也可手動貼上後評分。";
 
     startBtn.addEventListener("click", () => {
-      startShadowing(item, transcript, score, toneScore, status, toneStatus, pitchLive, startBtn, stopBtn);
+      startShadowing(
+        item,
+        transcript,
+        score,
+        toneScore,
+        status,
+        toneStatus,
+        pitchLive,
+        recordedAudio,
+        recordingStatus,
+        startBtn,
+        stopBtn
+      );
     });
 
     stopBtn.addEventListener("click", () => {
@@ -652,6 +718,8 @@ function renderConversationSection(section) {
     row.appendChild(toneStatus);
     row.appendChild(pitchLive);
     row.appendChild(pitchCanvas);
+    row.appendChild(recordingStatus);
+    row.appendChild(recordedAudio);
     row.appendChild(transcript);
     list.appendChild(row);
   });
