@@ -279,10 +279,29 @@ body {
   font-weight: 700;
 }
 
+.score-badge-tone {
+  background: #eefbf4;
+  color: #1d7a47;
+}
+
 .practice-status,
 .practice-transcript {
   margin: 8px 0 0;
   color: var(--subtext);
+}
+
+.practice-tone,
+.practice-tone-live {
+  margin: 8px 0 0;
+  color: var(--subtext);
+}
+
+.pitch-canvas {
+  margin-top: 8px;
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  border-radius: 8px;
 }
 
 .practice-transcript {

@@ -12,6 +12,7 @@ const sidebar = document.getElementById("sidebar");
 const sidebarToggle = document.getElementById("sidebarToggle");
 let activeRecognition = null;
 let activePracticeControls = null;
+let activePitchSession = null;
 
 sidebarToggle.addEventListener("click", () => {
   sidebar.classList.toggle("open");
@@ -230,11 +231,197 @@ function scoreTranscript(expected, actual) {
   return Math.max(0, Math.min(100, score));
 }
 
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function detectPitch(buffer, sampleRate) {
+  let rms = 0;
+  for (let i = 0; i < buffer.length; i += 1) {
+    rms += buffer[i] * buffer[i];
+  }
+  rms = Math.sqrt(rms / buffer.length);
+  if (rms < 0.01) return -1;
+
+  let r1 = 0;
+  let r2 = buffer.length - 1;
+  const threshold = 0.2;
+  for (let i = 0; i < buffer.length / 2; i += 1) {
+    if (Math.abs(buffer[i]) < threshold) {
+      r1 = i;
+      break;
+    }
+  }
+  for (let i = 1; i < buffer.length / 2; i += 1) {
+    if (Math.abs(buffer[buffer.length - i]) < threshold) {
+      r2 = buffer.length - i;
+      break;
+    }
+  }
+
+  const trimmed = buffer.slice(r1, r2);
+  const correlations = new Array(trimmed.length).fill(0);
+  for (let lag = 0; lag < trimmed.length; lag += 1) {
+    for (let i = 0; i < trimmed.length - lag; i += 1) {
+      correlations[lag] += trimmed[i] * trimmed[i + lag];
+    }
+  }
+
+  let dipIndex = 0;
+  while (dipIndex < correlations.length - 1 && correlations[dipIndex] > correlations[dipIndex + 1]) {
+    dipIndex += 1;
+  }
+
+  let maxCorrelation = -1;
+  let maxIndex = -1;
+  for (let i = dipIndex; i < correlations.length; i += 1) {
+    if (correlations[i] > maxCorrelation) {
+      maxCorrelation = correlations[i];
+      maxIndex = i;
+    }
+  }
+  if (maxIndex <= 0) return -1;
+  return sampleRate / maxIndex;
+}
+
+function drawPitchCanvas(canvas, pitches) {
+  const ctx = canvas.getContext("2d");
+  const width = canvas.width;
+  const height = canvas.height;
+
+  ctx.fillStyle = "#f7f9ff";
+  ctx.fillRect(0, 0, width, height);
+  ctx.strokeStyle = "#d5def2";
+  ctx.lineWidth = 1;
+  ctx.strokeRect(0.5, 0.5, width - 1, height - 1);
+
+  if (!pitches.length) {
+    ctx.fillStyle = "#7180a0";
+    ctx.font = "12px sans-serif";
+    ctx.fillText("尚未偵測到語調", 10, 22);
+    return;
+  }
+
+  const minHz = Math.min(...pitches);
+  const maxHz = Math.max(...pitches);
+  const range = Math.max(1, maxHz - minHz);
+
+  ctx.strokeStyle = "#4067d6";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  pitches.forEach((hz, index) => {
+    const x = (index / Math.max(1, pitches.length - 1)) * (width - 12) + 6;
+    const y = height - 8 - ((hz - minHz) / range) * (height - 16);
+    if (index === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
+    }
+  });
+  ctx.stroke();
+}
+
+function analyzePitchContour(pitches) {
+  if (!pitches || pitches.length < 8) {
+    return null;
+  }
+  const minHz = Math.round(Math.min(...pitches));
+  const maxHz = Math.round(Math.max(...pitches));
+  const range = maxHz - minHz;
+  const coverage = clamp(pitches.length / 40, 0, 1);
+  const variety = clamp(range / 120, 0, 1);
+  const toneScore = Math.round((coverage * 0.4 + variety * 0.6) * 100);
+
+  let advice = "語調起伏自然。";
+  if (range < 35) advice = "語調偏平，可加大高低起伏。";
+  if (range > 190) advice = "語調起伏較大，可放穩一點。";
+
+  return {
+    score: toneScore,
+    minHz,
+    maxHz,
+    range,
+    advice
+  };
+}
+
+function stopPitchTracking() {
+  if (!activePitchSession) return;
+  const session = activePitchSession;
+  activePitchSession = null;
+
+  cancelAnimationFrame(session.rafId);
+  session.stream.getTracks().forEach((track) => track.stop());
+  session.audioContext.close();
+
+  drawPitchCanvas(session.pitchCanvas, session.pitches);
+  const analysis = analyzePitchContour(session.pitches);
+  if (!analysis) {
+    session.toneScoreEl.textContent = "語調 —";
+    session.toneStatusEl.textContent = "語調：未偵測到穩定語音。";
+    return;
+  }
+  session.toneScoreEl.textContent = `語調 ${analysis.score}`;
+  session.toneStatusEl.textContent = `語調：${analysis.minHz}-${analysis.maxHz}Hz（跨度 ${analysis.range}Hz）。${analysis.advice}`;
+}
+
+async function startPitchTracking(pitchLiveEl, pitchCanvas, toneScoreEl, toneStatusEl) {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    toneStatusEl.textContent = "語調：此瀏覽器不支援麥克風擷取。";
+    return false;
+  }
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) {
+    toneStatusEl.textContent = "語調：此瀏覽器不支援音訊分析。";
+    return false;
+  }
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const audioContext = new AudioContextClass();
+    const source = audioContext.createMediaStreamSource(stream);
+    const analyser = audioContext.createAnalyser();
+    analyser.fftSize = 2048;
+    source.connect(analyser);
+
+    const buffer = new Float32Array(analyser.fftSize);
+    const pitches = [];
+    let rafId = 0;
+    const capture = () => {
+      analyser.getFloatTimeDomainData(buffer);
+      const hz = detectPitch(buffer, audioContext.sampleRate);
+      if (hz >= 80 && hz <= 500) {
+        pitches.push(hz);
+        pitchLiveEl.textContent = `即時音高：約 ${Math.round(hz)} Hz`;
+      }
+      rafId = requestAnimationFrame(capture);
+    };
+    capture();
+
+    activePitchSession = {
+      stream,
+      audioContext,
+      rafId,
+      pitches,
+      pitchCanvas,
+      toneScoreEl,
+      toneStatusEl
+    };
+    toneScoreEl.textContent = "語調 分析中";
+    toneStatusEl.textContent = "語調：分析中...";
+    return true;
+  } catch (error) {
+    toneStatusEl.textContent = "語調：無法啟用麥克風，請確認權限。";
+    return false;
+  }
+}
+
 function stopRecognition() {
   if (activeRecognition) {
     activeRecognition.stop();
     activeRecognition = null;
   }
+  stopPitchTracking();
   if (activePracticeControls) {
     activePracticeControls.startBtn.disabled = false;
     activePracticeControls.stopBtn.disabled = true;
@@ -254,7 +441,7 @@ function setPracticeScore(expected, transcriptEl, scoreEl, statusEl) {
   statusEl.textContent = score >= 80 ? "很接近標準句。" : "可以再跟一次。";
 }
 
-function startShadowing(item, transcriptEl, scoreEl, statusEl, startBtn, stopBtn) {
+async function startShadowing(item, transcriptEl, scoreEl, toneScoreEl, statusEl, toneStatusEl, pitchLiveEl, startBtn, stopBtn) {
   const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!Recognition) {
     statusEl.textContent = "此瀏覽器不支援語音辨識，可改用手動輸入後按「手動評分」。";
@@ -273,8 +460,13 @@ function startShadowing(item, transcriptEl, scoreEl, statusEl, startBtn, stopBtn
   statusEl.textContent = "請開始跟讀...";
   transcriptEl.value = "";
   scoreEl.textContent = "—";
+  toneScoreEl.textContent = "語調 —";
+  toneStatusEl.textContent = "語調：尚未分析";
+  pitchLiveEl.textContent = "即時音高：—";
   startBtn.disabled = true;
   stopBtn.disabled = false;
+
+  await startPitchTracking(pitchLiveEl, document.getElementById(`pitch-canvas-${item.practiceId}`), toneScoreEl, toneStatusEl);
 
   recognition.onresult = (event) => {
     const transcript = event.results[0][0].transcript;
@@ -293,6 +485,7 @@ function startShadowing(item, transcriptEl, scoreEl, statusEl, startBtn, stopBtn
   recognition.onend = () => {
     if (activeRecognition === recognition) {
       activeRecognition = null;
+      stopPitchTracking();
       startBtn.disabled = false;
       stopBtn.disabled = true;
       activePracticeControls = null;
@@ -354,6 +547,7 @@ function renderConversationSection(section) {
   list.className = "conversation-list";
 
   section.items.forEach((item, index) => {
+    item.practiceId = `${section.title}-${index}`.replace(/\s+/g, "-");
     const row = document.createElement("article");
     row.className = "conversation-line";
 
@@ -399,11 +593,30 @@ function renderConversationSection(section) {
 
     const score = document.createElement("span");
     score.className = "score-badge";
-    score.textContent = "—";
+    score.textContent = "字詞 —";
+
+    const toneScore = document.createElement("span");
+    toneScore.className = "score-badge score-badge-tone";
+    toneScore.textContent = "語調 —";
 
     const status = document.createElement("p");
     status.className = "practice-status";
     status.textContent = "尚未評分";
+
+    const toneStatus = document.createElement("p");
+    toneStatus.className = "practice-tone";
+    toneStatus.textContent = "語調：尚未分析";
+
+    const pitchLive = document.createElement("p");
+    pitchLive.className = "practice-tone-live";
+    pitchLive.textContent = "即時音高：—";
+
+    const pitchCanvas = document.createElement("canvas");
+    pitchCanvas.className = "pitch-canvas";
+    pitchCanvas.width = 360;
+    pitchCanvas.height = 90;
+    pitchCanvas.id = `pitch-canvas-${item.practiceId}`;
+    drawPitchCanvas(pitchCanvas, []);
 
     const transcript = document.createElement("textarea");
     transcript.className = "practice-transcript";
@@ -411,7 +624,7 @@ function renderConversationSection(section) {
     transcript.placeholder = "辨識結果會出現在這裡；也可手動貼上後評分。";
 
     startBtn.addEventListener("click", () => {
-      startShadowing(item, transcript, score, status, startBtn, stopBtn);
+      startShadowing(item, transcript, score, toneScore, status, toneStatus, pitchLive, startBtn, stopBtn);
     });
 
     stopBtn.addEventListener("click", () => {
@@ -431,10 +644,14 @@ function renderConversationSection(section) {
     actions.appendChild(stopBtn);
     actions.appendChild(manualScoreBtn);
     actions.appendChild(score);
+    actions.appendChild(toneScore);
     row.appendChild(speaker);
     row.appendChild(text);
     row.appendChild(actions);
     row.appendChild(status);
+    row.appendChild(toneStatus);
+    row.appendChild(pitchLive);
+    row.appendChild(pitchCanvas);
     row.appendChild(transcript);
     list.appendChild(row);
   });
