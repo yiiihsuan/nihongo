@@ -233,6 +233,36 @@
             "3) きのう → きのう 何（なに）を しましたか。……勉強（べんきょう）しました / 本（ほん）を 読（よ）みました。羅馬拼音：kinou → kinou nani o shimashita ka. ...benkyou shimashita / hon o yomimashita. 中文：昨天 → 昨天做了什麼？……唸書了 / 看書了。",
             "4) おととい → おととい 何（なに）を しましたか。……デパートへ 行（い）きました。羅馬拼音：ototoi → ototoi nani o shimashita ka. ...depaato e ikimashita. 中文：前天 → 前天做了什麼？……去了百貨公司。"
           ]
+        },
+        {
+          "title": "5.",
+          "items": [
+            "例：写真（しゃしん）を 撮（と）ります（庭（にわ））→ 問：どこで 写真（しゃしん）を 撮（と）りますか。→ 答：……庭（にわ）で 撮（と）ります。\n羅馬拼音：dokode shashin o torimasu ka. ...niwa de torimasu.\n中文：要在哪裡拍照？……在庭院拍照。",
+            "1) ミラーさんに 会（あ）います（駅（えき））→ 問：どこで ミラーさんに 会（あ）いますか。→ 答：……駅（えき）で 会（あ）います。\n羅馬拼音：dokode miraa-san ni aimasu ka. ...eki de aimasu.\n中文：要在哪裡跟米勒先生見面？……在車站見面。",
+            "2) 昼（ひる）ごはんを 買（た）べます（会社（かいしゃ）の 食堂（しょくどう））→ 問：どこで 昼（ひる）ごはんを 買（た）べますか。→ 答：……会社（かいしゃ）の 食堂（しょくどう）で 買（た）べます。\n羅馬拼音：dokode hirugohan o tabemasu ka. ...kaisha no shokudou de tabemasu.\n中文：要在哪裡吃午餐？……在公司的餐廳吃。",
+            "3) 牛乳（ぎゅうにゅう）を 買（か）いました（スーパー）→ 問：どこで 牛乳（ぎゅうにゅう）を 買（か）いましたか。→ 答：……スーパーで 買（か）いました。\n羅馬拼音：dokode gyuunyuu o kaimashita ka. ...suupaa de kaimashita.\n中文：在哪裡買了牛奶？……在超市買的。",
+            "4) 日本語（にほんご）を 勉強（べんきょう）しました（大学（だいがく））→ 問：どこで 日本語（にほんご）を 勉強（べんきょう）しましたか。→ 答：……大学（だいがく）で 勉強（べんきょう）しました。\n羅馬拼音：dokode nihongo o benkyou shimashita ka. ...daigaku de benkyou shimashita.\n中文：在哪裡學了日文？……在大學學的。"
+          ]
+        },
+        {
+          "title": "6.",
+          "items": [
+            "例：今晩（こんばん）→ 問：今晩（こんばん） 何（なに）を しますか。→ 答：……うちで 宿題（しゅくだい）を します。それから CDを 聞（き）きます。\n羅馬拼音：konban nani o shimasu ka. ...uchi de shukudai o shimasu. sorekara shiideii o kikimasu.\n中文：今晚要做什麼？……在家寫作業。然後聽 CD。",
+            "1) あした → 問：あした 何（なに）を しますか。→ 答：……IMCで 電話（でんわ）を します（/ 会社（かいしゃ）へ 行（い）きます）。それから 日本語（にほんご）を 勉強（べんきょう）します。\n羅馬拼音：ashita nani o shimasu ka. ...IMC de denwa o shimasu. sorekara nihongo o benkyou shimasu.\n中文：明天要做什麼？……在 IMC 打電話。然後學日文。",
+            "2) 来週（らいしゅう）の 土曜日（どようび）→ 問：来週（らいしゅう）の 土曜日（どようび） 何（なに）を しますか。→ 答：……神戸（こうべ）で 昼（ひる）ごはん（/ 晩（ばん）ごはん）を 買（た）べます。それから 映画（えいが）を 見（み）ます。\n羅馬拼音：raishuu no doyoubi nani o shimasu ka. ...koube de hirugohan o tabemasu. sorekara eiga o mimasu.\n中文：下週六要做什麼？……在神戶吃午餐（/晚餐）。然後看電影。",
+            "3) きのうの 午後（ごご）→ 問：きのうの 午後（ごご） 何（なに）を しましたか。→ 答：……ロビーで テレビを 見（み）ました。それから 手紙（てがみ）を 書（か）きました。\n羅馬拼音：kinou no gogo nani o shimashita ka. ...robii de terebi o mimashita. sorekara tegami o kakimashita.\n中文：昨天下午做了什麼？……在大廳看電視。然後寫了信。",
+            "4) 先週（せんしゅう）の 日曜日（にちようび）→ 問：先週（せんしゅう）の 日曜日（にちようび） 何（なに）を しましたか。→ 答：……庭（にわ）で サッカーを しました。それから ビールを 飲（の）みました。\n羅馬拼音：senshuu no nichiyoubi nani o shimashita ka. ...niwa de sakkaa o shimashita. sorekara biiru o nomimashita.\n中文：上週日做了什麼？……在庭院踢足球。然後喝了啤酒。"
+          ]
+        },
+        {
+          "title": "7.",
+          "items": [
+            "例：→ 問：いっしょに 京都（きょうと）へ 行（い）きませんか。→ 答：……ええ、行（い）きましょう。\n羅馬拼音：isshoni kyouto e ikimasen ka. ...ee, ikimashou.\n中文：要不要一起去京都？……好啊，一起去吧。",
+            "1) → 問：いっしょに 昼（ひる）ごはんを 買（た）べませんか。→ 答：……ええ、買（た）べましょう。\n羅馬拼音：isshoni hirugohan o tabemasen ka. ...ee, tabemashou.\n中文：要不要一起吃午餐？……好啊，一起吃吧。",
+            "2) → 問：いっしょに コーヒーを 飲（の）みませんか。→ 答：……ええ、飲（の）みましょう。\n羅馬拼音：isshoni koohii o nomimasen ka. ...ee, nomimashou.\n中文：要不要一起喝咖啡？……好啊，一起喝吧。",
+            "3) → 問：いっしょに 映画（えいが）を 見（み）ませんか。→ 答：……ええ、見（み）ましょう。\n羅馬拼音：isshoni eiga o mimasen ka. ...ee, mimashou.\n中文：要不要一起看電影？……好啊，一起看吧。",
+            "4) → 問：いっしょに テニスを しませんか。→ 答：……ええ、しましょう。\n羅馬拼音：isshoni tenisu o shimasen ka. ...ee, shimashou.\n中文：要不要一起打網球？……好啊，一起打吧。"
+          ]
         }
       ]
     }
