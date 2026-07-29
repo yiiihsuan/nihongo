@@ -80,6 +80,8 @@
     {
       "title": "会話",
       "note": "いっしょに 行きませんか",
+      "practice": "shadowing",
+      "audio": "audio/beginner-1/lesson-06/conversation.mp3",
       "items": [
         {
           "speaker": "佐藤",

@@ -201,6 +201,80 @@ body {
   padding: 14px;
 }
 
+.conversation-card {
+  gap: 12px;
+}
+
+.conversation-toolbar {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.conversation-list {
+  display: grid;
+  gap: 12px;
+}
+
+.conversation-line {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px;
+  background: #fbfcff;
+}
+
+.speaker {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  margin-bottom: 8px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: #2440a4;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.conversation-text {
+  display: grid;
+  gap: 4px;
+}
+
+.conversation-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.practice-btn {
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.score-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #eff4ff;
+  color: #2440a4;
+  font-weight: 700;
+}
+
+.practice-status,
+.practice-transcript {
+  margin: 8px 0 0;
+  color: var(--subtext);
+}
+
 .jp {
   margin: 0 0 4px;
   font-size: 1.15rem;
@@ -263,5 +337,13 @@ pre.code-sample {
 
   .audio-wrap audio {
     width: 100%;
+  }
+
+  .conversation-actions {
+    align-items: stretch;
+  }
+
+  .score-badge {
+    width: fit-content;
   }
 }
