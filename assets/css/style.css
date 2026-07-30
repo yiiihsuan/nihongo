@@ -155,6 +155,38 @@ body {
   color: var(--subtext);
 }
 
+.summary-table {
+  border-collapse: collapse;
+  width: 100%;
+  max-width: 480px;
+  margin-bottom: 8px;
+  font-size: 0.92rem;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.summary-table th {
+  background-color: var(--primary);
+  color: #fff;
+  padding: 8px 14px;
+  text-align: left;
+}
+
+.summary-table td {
+  padding: 7px 14px;
+  border-bottom: 1px solid var(--line);
+  color: var(--text);
+}
+
+.summary-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.summary-table tbody tr:nth-child(even) td {
+  background-color: var(--bg);
+}
+
 .section-body {
   display: grid;
   gap: 10px;

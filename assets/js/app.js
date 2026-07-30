@@ -166,6 +166,27 @@ function renderSection(section) {
   const body = document.createElement("div");
   body.className = "section-body";
 
+  if (Array.isArray(section.summary) && section.summary.length > 0) {
+    const tbl = document.createElement("table");
+    tbl.className = "summary-table";
+    const thead = tbl.createTHead();
+    const hrow = thead.insertRow();
+    ["題號", "主題"].forEach((h) => {
+      const th = document.createElement("th");
+      th.textContent = h;
+      hrow.appendChild(th);
+    });
+    const tbody = tbl.createTBody();
+    section.summary.forEach((row) => {
+      const tr = tbody.insertRow();
+      const td1 = tr.insertCell();
+      td1.textContent = row.no;
+      const td2 = tr.insertCell();
+      td2.textContent = row.topic;
+    });
+    body.appendChild(tbl);
+  }
+
   if (Array.isArray(section.groups) && section.groups.length > 0) {
     section.groups.forEach((group) => {
       body.appendChild(renderVocabularyGroup(group));
