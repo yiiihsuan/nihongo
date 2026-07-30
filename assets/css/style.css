@@ -167,7 +167,7 @@ body {
 }
 
 .summary-table th {
-  background-color: var(--primary);
+  background-color: var(--accent);
   color: #fff;
   padding: 8px 14px;
   text-align: left;
