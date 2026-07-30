@@ -611,7 +611,12 @@ function renderConversationSection(section) {
   const list = document.createElement("div");
   list.className = "conversation-list";
 
-  section.items.forEach((item, index) => {
+  // Support both section.items and section.groups[].items
+  const items = Array.isArray(section.items) && section.items.length > 0
+    ? section.items
+    : (Array.isArray(section.groups) ? section.groups.flatMap(g => g.items || []) : []);
+
+  items.forEach((item, index) => {
     item.practiceId = `${section.title}-${index}`.replace(/\s+/g, "-");
     const row = document.createElement("article");
     row.className = "conversation-line";
