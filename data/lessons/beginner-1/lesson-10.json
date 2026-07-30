@@ -580,6 +580,8 @@
     {
       "title": "問題 3番",
       "note": "聽對話，判斷句子是否正確（○／×）",
+      "practice": "shadowing",
+      "audio": "audio/beginner-1/lesson-10/mondai-03.mp3",
       "groups": [
         {
           "title": "1）Teresa 在哪裡？",
